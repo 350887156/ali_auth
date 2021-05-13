@@ -46,7 +46,6 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
   } else if ([@"debugLogin" isEqualToString:call.method]) {
       UIViewController *controller = [AliAuthPluginUtil findCurrentViewController];
       TXCustomModel *model = [AliAuthCustomUIUtil handle:call.arguments];
-      
       [[TXCommonHandler sharedInstance] debugLoginUIWithController:controller model:model complete:^(NSDictionary * _Nonnull resultDic) {
           __strong typeof(self) strongSelf = weakSelf;
           [strongSelf.channel sendMessage:resultDic];
@@ -73,67 +72,10 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
   } else if ([@"getCurrentCarrierName" isEqualToString:call.method]) {
       NSString *name = [TXCommonUtils getCurrentCarrierName];
       result(name);
+  } else {
+    result(FlutterMethodNotImplemented);
   }
-  
-  
-//  else {
-//    result(FlutterMethodNotImplemented);
-//  }
 }
-- (void)log:(NSDictionary *)resultDic {
-   
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:resultDic options:0 error:0];
-    NSString *dataStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    NSLog(@"Flutter iOS 日志%@",dataStr);
-}
-- (TXCustomModel *)_buildSheetPortraitModel:(NSDictionary *)arguments {
-    
-    NSDictionary *customUIConfig = arguments[@"UIConfig"];
-    
-    TXCustomModel *model = [[TXCustomModel alloc] init];
-    model.supportedInterfaceOrientations = UIInterfaceOrientationMaskPortrait;
-    model.alertCornerRadiusArray = @[@0, @0, @0, @0];
-    model.alertTitleBarColor = [UIColor orangeColor];
-    NSDictionary *attributes = @{
-        NSForegroundColorAttributeName : [UIColor whiteColor],
-        NSFontAttributeName : [UIFont systemFontOfSize:20.0]
-    };
-    model.alertTitle = [[NSAttributedString alloc] initWithString:@"一键登录" attributes:attributes];
-    model.alertCloseImage = [UIImage imageNamed:@"icon_close_light"];
-    model.logoImage = [UIImage imageNamed:@"taobao"];
-    model.changeBtnIsHidden = YES;
-    model.checkBoxIsChecked = true;
-//    model.privacyOne = @[@"协议", @"https://www.baidu.com"];
-    model.alertTitleBarColor = [UIColor whiteColor];
-    model.contentViewFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        frame.size.width = superViewSize.width;
-        frame.size.height = 460;
-        frame.origin.x = 0;
-        frame.origin.y = superViewSize.height - frame.size.height;
-        return frame;
-    };
-    model.logoFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        frame.size.width = 80;
-        frame.size.height = 80;
-        frame.origin.y = 20;
-        frame.origin.x = (superViewSize.width - 80) * 0.5;
-        return frame;
-    };
-    model.sloganFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        frame.origin.y = 20 + 80 + 20;
-        return frame;
-    };
-    model.numberFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        frame.origin.y = 120 + 20 + 15;
-        return frame;
-    };
-    model.loginBtnFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
-        frame.origin.y = 155 + 20 + 30;
-        return frame;
-    };
 
-    
-    return model;
-}
 
 @end

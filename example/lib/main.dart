@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:03
- * @LastEditTime: 2021-05-13 15:57:09
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-05-13 18:55:52
+ * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /example/lib/main.dart
  */
@@ -34,7 +34,10 @@ class _MyAppState extends State<MyApp> {
               //ios
               final appKey =
                   'FqkuICQmq6p56nf0eEW56DH87rDJkhpIhnmUm8B4VNsa2GpfX6usLW/12ANy3HJnLcYjQb88epymuft++tPIJ8th8943KcUYwD8QhKLPuYyWpi2/GxGgW0+n30NP6fKyuL6UYlG24F7/UaC0oXum1kG4fwdFgDmTI4jqlQC2kpbpdZUsCeNs1fGXmjFUUPwjKI6GMzzM+DaNwxlj+C1C8QDMgoV1/dEq6AqL21ijxm3We5f3hEzBcuDzRf9L0T9VpEgE4l7pIj8=';
-              final result = await AliAuth.init(iOSKey: appKey);
+              final androidKey =
+                  'YlLUxHLm2Uw6fqTrLrPku8XNnTDEOIov7hZH2rpAXwFaenzsFGjbKziuCD8TCdjUNmwN7cb37DxvpHKJXt/mZnpjkyQVcR1fJqFYzbliJgSbp3C7CJoG6dzEYYH6iQ1v2/0Sbi9nD3H1t8arCO9RrgD4OXJwVvH1eVzQ8eQa3jOQSeFLXR6oW/8Eljp4HV4KmtIxaczs852mW07Cf0w/+06w1GfHmlocS05/XF59WBG31dIl+isNNmqprDBW7lWon/ItTCkkKus2/8u2Mxby0mWQSXc4bHBQHt0a7op/hYVgc3JKoxjskA==';
+              final result =
+                  await AliAuth.init(iOSKey: appKey, androidKey: androidKey);
               print('flutter打印日志$result');
             }),
             _action('取消登录', () async {
@@ -42,7 +45,7 @@ class _MyAppState extends State<MyApp> {
               print('flutter打印日志$result');
             }),
             _action('加速一键登录授权页弹起', () async {
-              final result = await AliAuth.pre();
+              final result = await AliAuth.prepareLogin();
               print('flutter打印日志$result');
             }),
             _action('login', () async {
@@ -71,18 +74,6 @@ class _MyAppState extends State<MyApp> {
               final result = await AliAuth.accelerateVerify();
               print('flutter打印日志$result');
             }),
-            _action('蜂窝数据网络是否开启，即3G/4G', () async {
-              final result = await AliAuth.checkDeviceCellularDataEnable();
-              print('flutter打印日志$result');
-            }),
-            _action('判断当前设备是否有SIM卡', () async {
-              final result = await AliAuth.simSupportedIsOK();
-              print('flutter打印日志$result');
-            }),
-            _action('获取当前上网卡运营商名称，比如中国移动', () async {
-              final result = await AliAuth.getCurrentCarrierName();
-              print('flutter打印日志$result');
-            })
           ],
         ),
       ),

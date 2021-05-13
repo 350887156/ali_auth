@@ -1,4 +1,4 @@
-package com.lajiaoyang.ali_auth_example;
+package wger.YXSH.mobile;
 
 import io.flutter.embedding.android.FlutterActivity;
 

@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-13 15:56:50
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-05-13 18:55:38
+ * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/lib/ali_auth.dart
  */
@@ -35,7 +35,7 @@ class AliAuth {
     return await _channel.invokeMethod('init', parameter);
   }
 
-  static Future pre() async {
+  static Future prepareLogin() async {
     return await _channel.invokeMethod('pre');
   }
 
@@ -59,20 +59,8 @@ class AliAuth {
     return await _channel.invokeMethod('accelerateVerify');
   }
 
-  static Future checkDeviceCellularDataEnable() async {
-    return await _channel.invokeMethod('checkDeviceCellularDataEnable');
-  }
-
-  static Future simSupportedIsOK() async {
-    return await _channel.invokeMethod('simSupportedIsOK');
-  }
-
   static Future cancelLogin() async {
     return await _channel.invokeMethod('cancelLogin');
-  }
-
-  static Future getCurrentCarrierName() async {
-    return await _channel.invokeMethod('getCurrentCarrierName');
   }
 }
 

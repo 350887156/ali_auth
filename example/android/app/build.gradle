@@ -29,19 +29,40 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.lajiaoyang.ali_auth_example"
+        applicationId "wger.YXSH.mobile"
         minSdkVersion 16
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        release {
+            // MD5 EFF111D992BBE530577C25F66D6BD374
+            storeFile file("../../key_store.keystore")
+            storePassword  'life_circle_2021'
+            keyAlias  'life_circle'
+            keyPassword 'life_circle_2021'
+        }
+        debug {
+            storeFile file("../../key_store.keystore")
+            storePassword 'life_circle_2021'
+            keyAlias  'life_circle'
+            keyPassword  'life_circle_2021'
+
+        }
+    }
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.release
+        }
+        debug {
             signingConfig signingConfigs.debug
         }
+        profile{
+            signingConfig signingConfigs.release
+        }
+       
     }
 }
 
