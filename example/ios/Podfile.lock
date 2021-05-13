@@ -1,0 +1,22 @@
+PODS:
+  - ali_auth (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - ali_auth (from `.symlinks/plugins/ali_auth/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  ali_auth:
+    :path: ".symlinks/plugins/ali_auth/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  ali_auth: 9464735c48353c054118bc7ec7baca1eb1360acc
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+
+PODFILE CHECKSUM: b1f7a399522c118a74b177b13c01eca692aa7e6d
+
+COCOAPODS: 1.10.1

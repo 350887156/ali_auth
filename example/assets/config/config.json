@@ -1,0 +1,7 @@
+{
+    "UIConfig":{
+        "logoImage":"",
+        "loginBtnBgImgs":"#00A57B,#878282,#00A57B",
+        "privacy":["协议","https://www.baidu.com"]
+        }
+}
