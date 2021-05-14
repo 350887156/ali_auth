@@ -231,7 +231,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
                 .setLogoImgPath(flutterAssets.getAssetFilePathByName((String)uiConfig.get("logoImage")))
                 .setLogoOffsetY(0)
                 .setLogoWidth(42)
-                .setLogBtnHeight(40)
+                .setLogBtnHeight(35)
                 .setLogoHeight(42)
                 .setNumFieldOffsetY(unit + 10)
                 .setNumberSizeDp(17)
