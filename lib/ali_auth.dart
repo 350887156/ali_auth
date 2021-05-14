@@ -31,7 +31,7 @@ class AliAuth {
     return await _channel.invokeMethod('init', parameter);
   }
 
-  void setMessageHandler(Future Function(dynamic message) handler) {
+  static void setMessageHandler(Future Function(dynamic message) handler) {
     _basicMessageChannel.setMessageHandler(handler);
   }
 
