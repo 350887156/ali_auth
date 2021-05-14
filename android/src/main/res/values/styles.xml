@@ -5,22 +5,11 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
-
-    <style name="AnimFadeBottomToUp" parent="@android:style/Animation.Activity">
-
-        <item name="android:activityOpenEnterAnimation">@anim/activity_b_translate_out_up_to_down</item>
-        <item name="android:activityCloseExitAnimation">@anim/activity_b_translate_out_up_to_down</item>
-        <item name="android:activityOpenExitAnimation">@anim/activity_a_translate_in_up_to_down</item>
-        <item name="android:activityCloseEnterAnimation">@anim/activity_a_translate_out_down_to_up</item>
-
-    </style>
-    <style name="vertical_slide" parent="android:Theme.Light.NoTitleBar">
-        <item name="android:windowAnimationStyle">@style/AnimFadeBottomToUp</item>
-<!--        <item name="android:windowIsTranslucent">true</item>-->
-<!--        <item name="android:windowBackground">@color/transparent_background</item>-->
-    </style>
-
-    <style name="activity_dialog" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@color/transparent</item>
+    <style name="web_activity" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- 背景透明 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
     </style>
 </resources>

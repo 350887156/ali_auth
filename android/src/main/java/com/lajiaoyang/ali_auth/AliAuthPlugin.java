@@ -235,7 +235,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
                 .setLogoHeight(42)
                 .setNumFieldOffsetY(unit + 10)
                 .setNumberSizeDp(17)
-//            .setPageBackgroundPath("dialog_page_background")
+            .setPageBackgroundPath("dialog_page_background")
                 .setSloganText("为了您的账号安全，请先绑定手机号")
                 .setSloganOffsetY(unit * 3)
                 .setSloganTextSizeDp(11)
