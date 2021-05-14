@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:03
- * @LastEditTime: 2021-05-13 18:55:52
+ * @LastEditTime: 2021-05-14 15:37:02
  * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /example/lib/main.dart
@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
               final model = AliAuthUIConfig(
                   logoImage: 'assets/taobao.png',
                   privacy: AliAuthUIConfigPrivacy(
-                      title: '协议', url: 'https://www.taobao.com'),
+                      title: '协议', url: 'https://www.baidu.com'),
                   loginBtnColors: ['#00A57B', '#878282', '#00A57B']);
               final result = await AliAuth.debugLogin(model);
               print('flutter打印日志$result');

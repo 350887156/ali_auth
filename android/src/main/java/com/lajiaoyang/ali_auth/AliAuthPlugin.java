@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-13 16:25:56
- * @LastEditors: your name
+ * @LastEditTime: 2021-05-14 11:33:55
+ * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/android/src/main/java/com/lajiaoyang/ali_auth/AliAuthPlugin.java
  */
@@ -29,6 +29,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.StandardMessageCodec;
 
@@ -58,13 +59,20 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
   private  PhoneNumberAuthHelper authHelper;
   private BasicMessageChannel basicMessageChannel;
   private TokenResultListener mTokenListener;
-  private static Activity activity;
+  private static Activity mActivity;
   private static Context mContext;
+  private int mScreenWidthDp;
+  private int mScreenHeightDp;
+  private FlutterAssets flutterAssets;
+
+
+
 //  @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "com.lajiaoyang.ali_auth");
     channel.setMethodCallHandler(this);
     mContext = flutterPluginBinding.getApplicationContext();
+    flutterAssets = flutterPluginBinding.getFlutterAssets();
     basicMessageChannel =  new BasicMessageChannel(flutterPluginBinding.getBinaryMessenger(),"com.lajiaoyang.ali_auth.BasicMessageChannel", StandardMessageCodec.INSTANCE);
   }
 
@@ -76,7 +84,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
         mTokenListener = new TokenResultListener() {
           @Override
           public void onTokenSuccess(final String s) {
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
 
               @Override
               public void run() {
@@ -93,7 +101,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
 
           @Override
           public void onTokenFailed(final String s) {
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
 
               @Override
               public void run() {
@@ -117,7 +125,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
         authHelper.accelerateLoginPage(5000, new PreLoginResultListener() {
           @Override
           public void onTokenSuccess(final String vendor) {
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
               @Override
               public void run() {
                 JSONObject jsonObject = new JSONObject();
@@ -130,7 +138,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
 
           @Override
           public void onTokenFailed(final String vendor, final String ret) {
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
               @Override
               public void run() {
                 JSONObject jsonObject = new JSONObject();
@@ -157,7 +165,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
         authHelper.accelerateVerify(5000, new PreLoginResultListener() {
           @Override
           public void onTokenSuccess(final String vendor) {
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
               @Override
               public void run() {
                 JSONObject jsonObject = new JSONObject();
@@ -170,7 +178,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
 
           @Override
           public void onTokenFailed(final String vendor, String errorMsg) {
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
               @Override
               public void run() {
                 JSONObject jsonObject = new JSONObject();
@@ -197,6 +205,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
     }
   }
   private void login(@NonNull MethodCall call) {
+    mActivity.overridePendingTransition(0,0);
     Map uiConfig = (Map) call.argument("UIConfig");
     ArrayList<String> privacy = (ArrayList<String>)uiConfig.get("privacy");
     authHelper.removeAuthRegisterXmlConfig();
@@ -205,36 +214,42 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
     if (Build.VERSION.SDK_INT == 26) {
       authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
     }
+    updateScreenSize(authPageOrientation);
+    int dialogWidth = (int) (mScreenWidthDp * 0.8f);
+    int dialogHeight = (int) (mScreenHeightDp * 0.65f) - 50;
+    int unit = dialogHeight / 10;
+    int logBtnHeight = (int) (unit * 1.2);
     AuthUIConfig.Builder builder = new AuthUIConfig.Builder();
     // 状态栏背景色
     builder.setStatusBarColor(Color.parseColor("#ffffff"))
-            .setLightColor(true)
-            // 导航栏设置
-            .setNavHidden(true)
-            // logo设置
-            .setLogoHidden(false)
-            .setLogoImgPath((String)uiConfig.get("logoImage"))
-            // slogan 设置
-            .setSloganHidden(true)
-            // 号码设置
-            .setSwitchAccHidden(true)
-            // 按钮设置
-            .setLogBtnBackgroundPath("button")
-            .setLogBtnHeight(38)
-            .setVendorPrivacyPrefix("《")
-            .setVendorPrivacySuffix("》")
-            // 切换到其他登录方式
-            .setScreenOrientation(authPageOrientation)
-            .setAuthPageActIn("in_activity","out_activity")
-            // 勾选框
-            .setCheckboxHidden(true)
-            .setPrivacyState(true)
-            .setAppPrivacyOne((String)privacy.get(0), (String)privacy.get(1))
-//              .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN) // 沉浸式，需隐藏状态栏否则会出现和状态栏重叠的问题
-            .setBottomNavColor(Color.parseColor("#ffffff"))
-            .setDialogBottom(true);
-    authHelper.setAuthUIConfig(builder.create());
+            .setAppPrivacyOne(privacy.get(0), privacy.get(1))
+                .setWebViewStatusBarColor(Color.TRANSPARENT)
+                .setNavHidden(true)
+                .setSwitchAccHidden(true)
+                .setPrivacyState(false)
+                .setCheckboxHidden(true)
+                .setLogoImgPath(flutterAssets.getAssetFilePathByName((String)uiConfig.get("logoImage")))
+                .setLogoOffsetY(0)
+                .setLogoWidth(42)
+                .setLogBtnHeight(40)
+                .setLogoHeight(42)
+                .setNumFieldOffsetY(unit + 10)
+                .setNumberSizeDp(17)
+//            .setPageBackgroundPath("dialog_page_background")
+                .setSloganText("为了您的账号安全，请先绑定手机号")
+                .setSloganOffsetY(unit * 3)
+                .setSloganTextSizeDp(11)
 
+                .setLogBtnOffsetY(unit * 4)
+                .setLogBtnHeight(logBtnHeight)
+                .setLogBtnMarginLeftAndRight(30)
+                .setLogBtnTextSizeDp(20)
+                .setVendorPrivacyPrefix("《")
+                .setVendorPrivacySuffix("》")
+                .setDialogHeight(dialogHeight)
+                .setDialogBottom(true)
+                .setScreenOrientation(authPageOrientation);
+    authHelper.setAuthUIConfig(builder.create());
 
     authHelper.getLoginToken(mContext,5000);
   }
@@ -255,6 +270,37 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
       return false;
     }
   }
+  protected void updateScreenSize(int authPageScreenOrientation) {
+    int screenHeightDp = CustomUIUtils.px2dp(mContext, CustomUIUtils.getPhoneHeightPixels(mContext));
+    int screenWidthDp = CustomUIUtils.px2dp(mContext, CustomUIUtils.getPhoneWidthPixels(mContext));
+    int rotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
+    if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_BEHIND) {
+      authPageScreenOrientation = mActivity.getRequestedOrientation();
+    }
+    if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE) {
+      rotation = Surface.ROTATION_90;
+    } else if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT) {
+      rotation = Surface.ROTATION_180;
+    }
+    switch (rotation) {
+      case Surface.ROTATION_0:
+      case Surface.ROTATION_180:
+        mScreenWidthDp = screenWidthDp;
+        mScreenHeightDp = screenHeightDp;
+        break;
+      case Surface.ROTATION_90:
+      case Surface.ROTATION_270:
+        mScreenWidthDp = screenHeightDp;
+        mScreenHeightDp = screenWidthDp;
+        break;
+      default:
+        break;
+    }
+  }
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
@@ -263,7 +309,7 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
 
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-    activity = binding.getActivity();
+    mActivity = binding.getActivity();
   }
 
   @Override

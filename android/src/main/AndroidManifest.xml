@@ -15,6 +15,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:launchMode="singleTop"
+            android:theme="@style/activity_dialog"
             android:screenOrientation="behind"  />
 
         <!--联通电信授权页-->
@@ -23,6 +24,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:launchMode="singleTask"
+            android:theme="@style/vertical_slide"
             android:screenOrientation="behind" />
 
         <!--移动授权页-->
