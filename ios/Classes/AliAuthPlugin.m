@@ -6,7 +6,7 @@
 static NSTimeInterval const kTimerOut = 5000;
 static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.ali_auth.BasicMessageChannel";
 @interface AliAuthPlugin()
-@property (nonatomic, strong) FlutterBasicMessageChannel *channel;
+@property (nonatomic, weak) FlutterMethodChannel *channel;
 @end
 @implementation AliAuthPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -16,11 +16,12 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
   AliAuthPlugin* instance = [[AliAuthPlugin alloc] initWithBinaryMessenger:[registrar messenger]];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
-- (instancetype)initWithBinaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger;
+- (instancetype)initWithChannel:(FlutterMethodChannel *)channel;
 {
+    
     self = [super init];
     if (self) {
-        self.channel = [FlutterBasicMessageChannel messageChannelWithName:kAliAuthPluginBasicMessageChannelKey binaryMessenger:messenger];
+        self.channel = channel;
     }
     return self;
 }
@@ -43,13 +44,6 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
           __strong typeof(self) strongSelf = weakSelf;
           [strongSelf.channel sendMessage:resultDic];
       }];
-  } else if ([@"debugLogin" isEqualToString:call.method]) {
-      UIViewController *controller = [AliAuthPluginUtil findCurrentViewController];
-      TXCustomModel *model = [AliAuthCustomUIUtil handle:call.arguments];
-      [[TXCommonHandler sharedInstance] debugLoginUIWithController:controller model:model complete:^(NSDictionary * _Nonnull resultDic) {
-          __strong typeof(self) strongSelf = weakSelf;
-          [strongSelf.channel sendMessage:resultDic];
-      }];
   } else if ([@"checkEnvAvailable" isEqualToString:call.method]) {
       
       [[TXCommonHandler sharedInstance] checkEnvAvailableWithAuthType:PNSAuthTypeLoginToken complete:^(NSDictionary * _Nullable resultDic) {
@@ -60,9 +54,6 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
           result(resultDic);
       }];
       
-  } else if ([@"checkDeviceCellularDataEnable" isEqualToString:call.method]) {
-      BOOL enable = [TXCommonUtils checkDeviceCellularDataEnable];
-      result(@(enable));
   } else if ([@"simSupportedIsOK" isEqualToString:call.method]) {
       BOOL sim = [TXCommonUtils simSupportedIsOK];
       result(@(sim));

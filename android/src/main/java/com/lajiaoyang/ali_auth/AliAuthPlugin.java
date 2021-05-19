@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-14 11:33:55
+ * @LastEditTime: 2021-05-19 14:00:50
  * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/android/src/main/java/com/lajiaoyang/ali_auth/AliAuthPlugin.java
@@ -34,7 +34,6 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.StandardMessageCodec;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.mobile.auth.gatewayauth.AuthRegisterViewConfig;
 import com.mobile.auth.gatewayauth.AuthRegisterXmlConfig;
 import com.mobile.auth.gatewayauth.AuthUIConfig;
@@ -49,193 +48,272 @@ import com.nirvana.tools.core.AppUtils;
 import com.lajiaoyang.ali_auth.CustomUIUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** AliAuthPlugin */
+/**
+ * AliAuthPlugin
+ */
 public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
 
-  private MethodChannel channel;
-  private  PhoneNumberAuthHelper authHelper;
-  private BasicMessageChannel basicMessageChannel;
-  private TokenResultListener mTokenListener;
-  private static Activity mActivity;
-  private static Context mContext;
-  private int mScreenWidthDp;
-  private int mScreenHeightDp;
-  private FlutterAssets flutterAssets;
+    private MethodChannel channel;
+    private PhoneNumberAuthHelper authHelper;
+    //  private TokenResultListener mTokenListener;
+    private static Activity mActivity;
+    private static Context mContext;
+    private int mScreenWidthDp;
+    private int mScreenHeightDp;
+    private FlutterAssets flutterAssets;
 
 
-
-//  @Override
-  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "com.lajiaoyang.ali_auth");
-    channel.setMethodCallHandler(this);
-    mContext = flutterPluginBinding.getApplicationContext();
-    flutterAssets = flutterPluginBinding.getFlutterAssets();
-    basicMessageChannel =  new BasicMessageChannel(flutterPluginBinding.getBinaryMessenger(),"com.lajiaoyang.ali_auth.BasicMessageChannel", StandardMessageCodec.INSTANCE);
-  }
-
-  @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    switch (call.method) {
-      case "init":
-      {
-        mTokenListener = new TokenResultListener() {
-          @Override
-          public void onTokenSuccess(final String s) {
-            mActivity.runOnUiThread(new Runnable() {
-
-              @Override
-              public void run() {
-                TokenRet tokenRet = null;
-                try {
-                  tokenRet = JSON.parseObject(s, TokenRet.class);
-                } catch (Exception e) {
-                  e.printStackTrace();
-                }
-                resultData(tokenRet);
-              }
-            });
-          }
-
-          @Override
-          public void onTokenFailed(final String s) {
-            mActivity.runOnUiThread(new Runnable() {
-
-              @Override
-              public void run() {
-                TokenRet tokenRet = null;
-                try {
-                  tokenRet = JSON.parseObject(s, TokenRet.class);
-                } catch (Exception e) {
-                  e.printStackTrace();
-                }
-                resultData(tokenRet);
-              }
-            });
-          }
-        };
-        authHelper = PhoneNumberAuthHelper.getInstance(mContext,mTokenListener);
-        String appKey = call.argument("appKey");
-        authHelper.setAuthSDKInfo(appKey);
-      }
-        break;
-      case "pre":
-        authHelper.accelerateLoginPage(5000, new PreLoginResultListener() {
-          @Override
-          public void onTokenSuccess(final String vendor) {
-            mActivity.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("code", vendor);
-                jsonObject.put("msg", "预取号成功！");
-                basicMessageChannel.send(jsonObject);
-              }
-            });
-          }
-
-          @Override
-          public void onTokenFailed(final String vendor, final String ret) {
-            mActivity.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("code", ret);
-                jsonObject.put("msg", "预取号失败");
-                basicMessageChannel.send(jsonObject);
-              }
-            });
-          }
-        });
-        break;
-      case "login":
-        login(call);
-        break;
-
-      case "debugLogin":
-        login(call);
-        break;
-
-      case "checkEnvAvailable":
-        authHelper.checkEnvAvailable(2);
-        break;
-      case "accelerateVerify":
-        authHelper.accelerateVerify(5000, new PreLoginResultListener() {
-          @Override
-          public void onTokenSuccess(final String vendor) {
-            mActivity.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("code", vendor);
-                jsonObject.put("msg", "加速获取本机号码成功！");
-                basicMessageChannel.send(jsonObject);
-              }
-            });
-          }
-
-          @Override
-          public void onTokenFailed(final String vendor, String errorMsg) {
-            mActivity.runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("code", vendor);
-                jsonObject.put("msg", "加速获取本机号码失败！");
-                basicMessageChannel.send(jsonObject);
-              }
-            });
-          }
-        });
-        break;
-
-      case "checkDeviceCellularDataEnable":
-        result.notImplemented();
-        break;
-      case "cancelLogin":
-        authHelper.quitLoginPage();
-        result.success(true);
-        break;
-      case "getCurrentCarrierName":
-        result.success(authHelper.getCurrentCarrierName());
-        break;
-
+    //  @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "com.lajiaoyang.ali_auth");
+        channel.setMethodCallHandler(this);
+        mContext = flutterPluginBinding.getApplicationContext();
+        flutterAssets = flutterPluginBinding.getFlutterAssets();
     }
-  }
-  private void login(@NonNull MethodCall call) {
-    mActivity.overridePendingTransition(0,0);
-    Map uiConfig = (Map) call.argument("UIConfig");
-    ArrayList<String> privacy = (ArrayList<String>)uiConfig.get("privacy");
-    authHelper.removeAuthRegisterXmlConfig();
-    authHelper.removeAuthRegisterViewConfig();
-    int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-    if (Build.VERSION.SDK_INT == 26) {
-      authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
+
+    @Override
+    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+        if (!call.method.equals("init") && authHelper == null) {
+            Map<String,String>  jsonObject = new  HashMap<String,String>();
+            jsonObject.put("code", "70001");
+            jsonObject.put("msg", "SDK未初始化");
+            jsonObject.put("method", call.method);
+            channel.invokeMethod("callBack", jsonObject);
+            return;
+        }
+        switch (call.method) {
+            case "init": {
+
+                authHelper = PhoneNumberAuthHelper.getInstance(mContext, null);
+                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                try {
+                    String appKey = call.argument("appKey");
+                    authHelper.setAuthSDKInfo(appKey);
+                    jsonObject.put("code", "0");
+                    jsonObject.put("msg", "SDK初始化成功");
+                    jsonObject.put("method", "init");
+
+                } catch (Exception e) {
+                    jsonObject.put("code", "700000");
+                    jsonObject.put("msg", "SDK初始化失败");
+                    jsonObject.put("method", "init");
+                }
+                channel.invokeMethod("callBack", jsonObject);
+            }
+            break;
+            case "pre":
+                PreLoginResultListener preLoginResultListener = new PreLoginResultListener() {
+                    @Override
+                    public void onTokenSuccess(final String vendor) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                                jsonObject.put("code", "0");
+                                jsonObject.put("msg", "加速一键登录授权页弹起成功！");
+                                jsonObject.put("method", "pre");
+                                channel.invokeMethod("callBack", jsonObject);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onTokenFailed(final String vendor, final String ret) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                                jsonObject.put("code", ret);
+                                jsonObject.put("msg", "加速一键登录授权页弹起失败!");
+                                jsonObject.put("method", "pre");
+                                channel.invokeMethod("callBack", jsonObject);
+                            }
+                        });
+                    }
+
+                };
+                authHelper.accelerateLoginPage(5000, preLoginResultListener);
+                break;
+            case "login":
+                TokenResultListener tokenResultListener = new TokenResultListener() {
+                    @Override
+                    public void onTokenSuccess(final String s) {
+                        mActivity.runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                TokenRet tokenRet = null;
+                                try {
+                                    tokenRet = JSON.parseObject(s, TokenRet.class);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                resultData("login", tokenRet);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onTokenFailed(final String s) {
+                        mActivity.runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                TokenRet tokenRet = null;
+                                try {
+                                    tokenRet = JSON.parseObject(s, TokenRet.class);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                resultData("login", tokenRet);
+                            }
+                        });
+                    }
+                };
+                authHelper.setAuthListener(tokenResultListener);
+                login(call);
+                break;
+
+            case "checkEnvAvailable": {
+                TokenResultListener listener = new TokenResultListener() {
+                    @Override
+                    public void onTokenSuccess(final String s) {
+                        mActivity.runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                TokenRet tokenRet = null;
+                                try {
+                                    tokenRet = JSON.parseObject(s, TokenRet.class);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                resultData("checkEnvAvailable", tokenRet);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onTokenFailed(final String s) {
+                        mActivity.runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                TokenRet tokenRet = null;
+                                try {
+                                    tokenRet = JSON.parseObject(s, TokenRet.class);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                resultData("checkEnvAvailable", tokenRet);
+                            }
+                        });
+                    }
+                };
+                authHelper.setAuthListener(listener);
+                authHelper.checkEnvAvailable(2);
+            }
+            break;
+            case "accelerateVerify": {
+                PreLoginResultListener preListener = new PreLoginResultListener() {
+                    @Override
+                    public void onTokenSuccess(final String vendor) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                                jsonObject.put("code", "0");
+                                jsonObject.put("msg", "加速获取本机号码成功！");
+                                jsonObject.put("method", "accelerateVerify");
+                                channel.invokeMethod("callBack", jsonObject);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onTokenFailed(final String vendor, String errorMsg) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                                jsonObject.put("code", "700000");
+                                jsonObject.put("msg", "加速获取本机号码失败！");
+                                jsonObject.put("method", "accelerateVerify");
+                                channel.invokeMethod("callBack", jsonObject);
+                            }
+                        });
+                    }
+                };
+                authHelper.accelerateVerify(5000, preListener);
+            }
+            break;
+            case "cancelLogin": {
+                authHelper.quitLoginPage();
+                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                jsonObject.put("code", "0");
+                jsonObject.put("msg", "取消登录成功！");
+                jsonObject.put("method", "cancelLogin");
+                channel.invokeMethod("callBack", jsonObject);
+
+            }
+            break;
+            case "getCurrentCarrierName": {
+                String name = authHelper.getCurrentCarrierName();
+                Map<String,String>  jsonObject = new  HashMap<String,String>();
+                if (name == null) {
+                    jsonObject.put("code", "600004");
+                    jsonObject.put("msg", "获取当前运营商名称失败");
+                    jsonObject.put("method", "getCurrentCarrierName");
+                } else {
+                    jsonObject.put("code", "0");
+                    jsonObject.put("name", name);
+                    jsonObject.put("msg", "获取当前运营商名称成功");
+                    jsonObject.put("method", "getCurrentCarrierName");
+                }
+
+                channel.invokeMethod("callBack", jsonObject);
+            }
+            break;
+
+        }
     }
-    updateScreenSize(authPageOrientation);
-    int dialogWidth = (int) (mScreenWidthDp * 0.8f);
-    int dialogHeight = (int) (mScreenHeightDp * 0.65f) - 50;
-    int unit = dialogHeight / 10;
-    int logBtnHeight = (int) (unit * 1.2);
-    AuthUIConfig.Builder builder = new AuthUIConfig.Builder();
-    // 状态栏背景色
-    builder.setStatusBarColor(Color.parseColor("#ffffff"))
-            .setAppPrivacyOne(privacy.get(0), privacy.get(1))
+
+    private void login(@NonNull MethodCall call) {
+        mActivity.overridePendingTransition(0, 0);
+        Map uiConfig = (Map) call.argument("UIConfig");
+        ArrayList<String> privacy = (ArrayList<String>) uiConfig.get("privacy");
+        authHelper.removeAuthRegisterXmlConfig();
+        authHelper.removeAuthRegisterViewConfig();
+        int authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+        if (Build.VERSION.SDK_INT == 26) {
+            authPageOrientation = ActivityInfo.SCREEN_ORIENTATION_BEHIND;
+        }
+        updateScreenSize(authPageOrientation);
+        int dialogWidth = (int) (mScreenWidthDp * 0.8f);
+        int dialogHeight = (int) (mScreenHeightDp * 0.65f) - 50;
+        int unit = dialogHeight / 10;
+        int logBtnHeight = (int) (unit * 1.2);
+        AuthUIConfig.Builder builder = new AuthUIConfig.Builder();
+        // 状态栏背景色
+        builder.setStatusBarColor(Color.parseColor("#ffffff"))
+                .setAppPrivacyOne(privacy.get(0), privacy.get(1))
                 .setWebViewStatusBarColor(Color.TRANSPARENT)
                 .setNavHidden(true)
                 .setSwitchAccHidden(true)
                 .setPrivacyState(false)
                 .setCheckboxHidden(true)
-                .setLogoImgPath(flutterAssets.getAssetFilePathByName((String)uiConfig.get("logoImage")))
+                .setLogoImgPath(flutterAssets.getAssetFilePathByName((String) uiConfig.get("logoImage")))
                 .setLogoOffsetY(0)
                 .setLogoWidth(42)
                 .setLogBtnHeight(35)
                 .setLogoHeight(42)
                 .setNumFieldOffsetY(unit + 10)
                 .setNumberSizeDp(17)
-            .setPageBackgroundPath("dialog_page_background")
+                .setPageBackgroundPath("dialog_page_background")
                 .setSloganText("为了您的账号安全，请先绑定手机号")
                 .setSloganOffsetY(unit * 3)
                 .setSloganTextSizeDp(11)
@@ -249,156 +327,163 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
                 .setDialogHeight(dialogHeight)
                 .setDialogBottom(true)
                 .setScreenOrientation(authPageOrientation);
-    authHelper.setAuthUIConfig(builder.create());
+        authHelper.setAuthUIConfig(builder.create());
 
-    authHelper.getLoginToken(mContext,5000);
-  }
-  private boolean dataStatus(Map data, String key ){
-    if(data.containsKey(key) && data.get(key) != null){
-      if((data.get(key) instanceof Float) || (data.get(key) instanceof Double) && (double) data.get(key) > -1){
-        return true;
-      } else if((data.get(key) instanceof Integer) || (data.get(key) instanceof Number) && (int) data.get(key) > -1){
-        return true;
-      } else if((data.get(key) instanceof Boolean) && (boolean) data.get(key)){
-        return true;
-      } else if((data.get(key) instanceof String) && !((String) data.get(key)).equals("")){
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
+        authHelper.getLoginToken(mContext, 5000);
     }
-  }
-  protected void updateScreenSize(int authPageScreenOrientation) {
-    int screenHeightDp = CustomUIUtils.px2dp(mContext, CustomUIUtils.getPhoneHeightPixels(mContext));
-    int screenWidthDp = CustomUIUtils.px2dp(mContext, CustomUIUtils.getPhoneWidthPixels(mContext));
-    int rotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
-    if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_BEHIND) {
-      authPageScreenOrientation = mActivity.getRequestedOrientation();
+
+    private boolean dataStatus(Map data, String key) {
+        if (data.containsKey(key) && data.get(key) != null) {
+            if ((data.get(key) instanceof Float) || (data.get(key) instanceof Double) && (double) data.get(key) > -1) {
+                return true;
+            } else if ((data.get(key) instanceof Integer) || (data.get(key) instanceof Number) && (int) data.get(key) > -1) {
+                return true;
+            } else if ((data.get(key) instanceof Boolean) && (boolean) data.get(key)) {
+                return true;
+            } else if ((data.get(key) instanceof String) && !((String) data.get(key)).equals("")) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
-    if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE) {
-      rotation = Surface.ROTATION_90;
-    } else if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-            || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT) {
-      rotation = Surface.ROTATION_180;
+
+    protected void updateScreenSize(int authPageScreenOrientation) {
+        int screenHeightDp = CustomUIUtils.px2dp(mContext, CustomUIUtils.getPhoneHeightPixels(mContext));
+        int screenWidthDp = CustomUIUtils.px2dp(mContext, CustomUIUtils.getPhoneWidthPixels(mContext));
+        int rotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
+        if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_BEHIND) {
+            authPageScreenOrientation = mActivity.getRequestedOrientation();
+        }
+        if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE) {
+            rotation = Surface.ROTATION_90;
+        } else if (authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                || authPageScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT) {
+            rotation = Surface.ROTATION_180;
+        }
+        switch (rotation) {
+            case Surface.ROTATION_0:
+            case Surface.ROTATION_180:
+                mScreenWidthDp = screenWidthDp;
+                mScreenHeightDp = screenHeightDp;
+                break;
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                mScreenWidthDp = screenHeightDp;
+                mScreenHeightDp = screenWidthDp;
+                break;
+            default:
+                break;
+        }
     }
-    switch (rotation) {
-      case Surface.ROTATION_0:
-      case Surface.ROTATION_180:
-        mScreenWidthDp = screenWidthDp;
-        mScreenHeightDp = screenHeightDp;
-        break;
-      case Surface.ROTATION_90:
-      case Surface.ROTATION_270:
-        mScreenWidthDp = screenHeightDp;
-        mScreenHeightDp = screenWidthDp;
-        break;
-      default:
-        break;
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        channel.setMethodCallHandler(null);
     }
-  }
 
-  @Override
-  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    channel.setMethodCallHandler(null);
-  }
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        mActivity = binding.getActivity();
+    }
 
-  @Override
-  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-    mActivity = binding.getActivity();
-  }
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
 
-  @Override
-  public void onDetachedFromActivityForConfigChanges() {
+    }
 
-  }
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
 
-  @Override
-  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+    }
 
-  }
+    @Override
+    public void onDetachedFromActivity() {
 
-  @Override
-  public void onDetachedFromActivity() {
+    }
 
-  }
-  private void resultData(TokenRet tokenRet){
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("data", null);
-
-    switch (tokenRet.getCode()){
-      case "600000":
-        String token = tokenRet.getToken();
-        authHelper.quitLoginPage();
+    private void resultData(String method, TokenRet tokenRet) {
+        Map<String,String>  jsonObject = new  HashMap<String,String>();
         jsonObject.put("code", tokenRet.getCode());
-        jsonObject.put("msg", "获取token成功！");
-        jsonObject.put("data", token);
-        break;
-      case "600001":
-        jsonObject.put("msg", "唤起授权页成功！");
-        break;
-      case "600002":
-        jsonObject.put("msg", "唤起授权⻚失败！建议切换到其他登录⽅式");
-        break;
-      case "600004":
-        jsonObject.put("msg", "获取运营商配置信息失败！创建⼯单联系⼯程师");
-        break;
-      case "600005":
-        jsonObject.put("msg", "⼿机终端不安全！切换到其他登录⽅式");
-        break;
-      case "600007":
-        jsonObject.put("msg", "未检测到sim卡！⽤户检查 SIM 卡后重试");
-        break;
-      case "600008":
-        jsonObject.put("msg", "蜂窝⽹络未开启！⽤户开启移动⽹络后重试");
-        break;
-      case "600009":
-        jsonObject.put("msg", "⽆法判断运营商! 创建⼯单联系⼯程师");
-        break;
-      case "600010":
-        jsonObject.put("msg", "未知异常创建！⼯单联系⼯程师");
-        break;
-      case "600011":
-        jsonObject.put("msg", "获取token失败！切换到其他登录⽅式");
-        break;
-      case "600012":
-        jsonObject.put("msg", "预取号失败！");
-        break;
-      case "600013":
-        jsonObject.put("msg", "运营商维护升级！该功能不可⽤创建⼯单联系⼯程师");
-        break;
-      case "600014":
-        jsonObject.put("msg", "运营商维护升级！该功能已达最⼤调⽤次创建⼯单联系⼯程师");
-        break;
-      case "600015":
-        jsonObject.put("msg", "接⼝超时！切换到其他登录⽅式");
-        break;
-      case "600017":
-        jsonObject.put("msg", "AppID、Appkey解析失败! 秘钥未设置或者设置错误，请先检查秘钥信息，如果⽆法解决问题创建⼯单联系⼯程师");
-        break;
-      case "600021":
-        jsonObject.put("msg", "点击登录时检测到运营商已切换！⽤户退出授权⻚，重新登录");
-        break;
-      case "600023":
-        jsonObject.put("msg", "加载⾃定义控件异常！检查⾃定义控件添加是否正确");
-        break;
-      case "600024":
-        jsonObject.put("msg", "终端环境检查⽀持认证");
-        break;
-      case "600025":
-        jsonObject.put("msg", "终端检测参数错误检查传⼊参数类型与范围是否正确");
-        break;
-      case "600026":
-        jsonObject.put("msg", "授权⻚已加载时不允许调⽤加速或预取号接⼝检查是否有授权⻚拉起后，去调⽤preLogin或者accelerateAuthPage的接⼝，该⾏为不允许");
-        break;
-      default:
-        break;
+        jsonObject.put("method", method);
+        switch (tokenRet.getCode()) {
+            case "600000":
+                String token = tokenRet.getToken();
+                authHelper.quitLoginPage();
+                jsonObject.put("code", tokenRet.getCode());
+                jsonObject.put("msg", "获取token成功！");
+                jsonObject.put("token", token);
+                jsonObject.put("code", "0");
+
+                break;
+            case "600001":
+                jsonObject.put("msg", "唤起授权页成功！");
+                jsonObject.put("code", "0");
+                break;
+            case "600002":
+                jsonObject.put("msg", "唤起授权⻚失败！建议切换到其他登录⽅式");
+                break;
+            case "600004":
+                jsonObject.put("msg", "获取运营商配置信息失败！创建⼯单联系⼯程师");
+                break;
+            case "600005":
+                jsonObject.put("msg", "⼿机终端不安全！切换到其他登录⽅式");
+                break;
+            case "600007":
+                jsonObject.put("msg", "未检测到sim卡！⽤户检查 SIM 卡后重试");
+                break;
+            case "600008":
+                jsonObject.put("msg", "蜂窝⽹络未开启！⽤户开启移动⽹络后重试");
+                break;
+            case "600009":
+                jsonObject.put("msg", "⽆法判断运营商! 创建⼯单联系⼯程师");
+                break;
+            case "600010":
+                jsonObject.put("msg", "未知异常创建！⼯单联系⼯程师");
+                break;
+            case "600011":
+                jsonObject.put("msg", "获取token失败！切换到其他登录⽅式");
+                break;
+            case "600012":
+                jsonObject.put("msg", "预取号失败！");
+                break;
+            case "600013":
+                jsonObject.put("msg", "运营商维护升级！该功能不可⽤创建⼯单联系⼯程师");
+                break;
+            case "600014":
+                jsonObject.put("msg", "运营商维护升级！该功能已达最⼤调⽤次创建⼯单联系⼯程师");
+                break;
+            case "600015":
+                jsonObject.put("msg", "接⼝超时！切换到其他登录⽅式");
+                break;
+            case "600017":
+                jsonObject.put("msg", "AppID、Appkey解析失败! 秘钥未设置或者设置错误，请先检查秘钥信息，如果⽆法解决问题创建⼯单联系⼯程师");
+                break;
+            case "600021":
+                jsonObject.put("msg", "点击登录时检测到运营商已切换！⽤户退出授权⻚，重新登录");
+                break;
+            case "600023":
+                jsonObject.put("msg", "加载⾃定义控件异常！检查⾃定义控件添加是否正确");
+                break;
+            case "600024":
+                jsonObject.put("msg", "终端环境检查⽀持认证");
+                jsonObject.put("code", "0");
+                break;
+            case "600025":
+                jsonObject.put("msg", "终端检测参数错误检查传⼊参数类型与范围是否正确");
+                break;
+            case "600026":
+                jsonObject.put("msg", "授权⻚已加载时不允许调⽤加速或预取号接⼝检查是否有授权⻚拉起后，去调⽤preLogin或者accelerateAuthPage的接⼝，该⾏为不允许");
+                break;
+            default:
+                break;
+        }
+
+        channel.invokeMethod("callBack", jsonObject);
     }
-    jsonObject.put("code", tokenRet.getCode());
-    basicMessageChannel.send(jsonObject);
-  }
 }

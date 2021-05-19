@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:03
- * @LastEditTime: 2021-05-14 15:49:09
+ * @LastEditTime: 2021-05-19 14:42:22
  * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /example/lib/main.dart
@@ -32,18 +32,23 @@ class _MyAppState extends State<MyApp> {
         ),
         body: ListView(
           children: [
-            _action('init', () async {
-              final result = await AliAuth.init(
-                  iOSKey: Config.iOSKey, androidKey: Config.androidKey);
-              print('flutter打印日志$result');
+            _action('初始化', () async {
+              AliAuth.init(
+                  iOSKey: Config.iOSKey,
+                  androidKey: Config.androidKey,
+                  callback: (result) {
+                    print('flutter打印日志${result.toMap}');
+                  });
             }),
             _action('取消登录', () async {
-              final result = await AliAuth.cancelLogin();
-              print('flutter打印日志$result');
+              AliAuth.cancelLogin(callback: (result) {
+                print('flutter打印日志${result.toMap}');
+              });
             }),
             _action('加速一键登录授权页弹起', () async {
-              final result = await AliAuth.prepareLogin();
-              print('flutter打印日志$result');
+              AliAuth.prepareLogin(callback: (result) {
+                print('flutter打印日志${result.toMap}');
+              });
             }),
             _action('login', () async {
               final model = AliAuthUIConfig(
@@ -51,25 +56,19 @@ class _MyAppState extends State<MyApp> {
                   privacy: AliAuthUIConfigPrivacy(
                       title: '协议', url: 'https://www.baidu.com'),
                   loginBtnColors: ['#00A57B', '#878282', '#00A57B']);
-              final result = await AliAuth.login(model);
-              print('flutter打印日志$result');
+              AliAuth.login(model, callback: (result) {
+                print('flutter打印日志${result.toMap}');
+              });
             }),
-            _action('debugLogin', () async {
-              final model = AliAuthUIConfig(
-                  logoImage: 'assets/taobao.png',
-                  privacy: AliAuthUIConfigPrivacy(
-                      title: '协议', url: 'https://www.baidu.com'),
-                  loginBtnColors: ['#00A57B', '#878282', '#00A57B']);
-              final result = await AliAuth.debugLogin(model);
-              print('flutter打印日志$result');
-            }),
-            _action('checkEnvAvailable', () async {
-              final result = await AliAuth.checkEnvAvailable();
-              print('flutter打印日志$result');
+            _action('检查环境是否可用', () async {
+              AliAuth.checkEnvAvailable(callback: (result) {
+                print('flutter打印日志${result.toMap}');
+              });
             }),
             _action('加速获取本机号码校验token', () async {
-              final result = await AliAuth.accelerateVerify();
-              print('flutter打印日志$result');
+              AliAuth.accelerateVerify(callback: (result) {
+                print('flutter打印日志${result.toMap}');
+              });
             }),
           ],
         ),

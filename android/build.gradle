@@ -27,12 +27,14 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+
 }
 dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.alibaba:fastjson:1.2.61'
-    implementation fileTree(dir: 'libs', include: ['*.aar','*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
 }
  
