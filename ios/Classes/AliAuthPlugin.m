@@ -3,7 +3,7 @@
 #import <YTXOperators/YTXOperators.h>
 #import "AliAuthPluginUtil.h"
 #import "AliAuthCustomUIUtil.h"
-static NSTimeInterval const kTimerOut = 5000;
+static NSTimeInterval const kTimerOut = 3;
 static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.ali_auth.BasicMessageChannel";
 @interface AliAuthPlugin()
 @property (nonatomic, strong) FlutterMethodChannel *channel;
