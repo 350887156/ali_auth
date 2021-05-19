@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-19 14:34:20
- * @LastEditors: Sclea
+ * @LastEditTime: 2021-05-19 16:10:15
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/lib/ali_auth.dart
  */
@@ -191,7 +191,7 @@ class AliAuthResultModel {
       case 'init':
         type = AliAuthResultType.Init;
         break;
-      case 'prepare':
+      case 'pre':
         type = AliAuthResultType.Prepare;
         break;
       case 'login':
