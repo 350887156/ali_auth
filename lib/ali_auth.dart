@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-19 16:10:15
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-05-20 09:06:43
+ * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/lib/ali_auth.dart
  */
@@ -55,7 +55,7 @@ class AliAuth {
       }
       _handleMessage(arguments);
     });
-    return await _channel.invokeMethod('init', parameter);
+    await _channel.invokeMethod('init', parameter);
   }
 
   static void _handleMessage(final dynamic arguments) {
