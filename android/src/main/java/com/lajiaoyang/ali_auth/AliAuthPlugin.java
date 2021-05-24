@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-20 11:17:41
+ * @LastEditTime: 2021-05-24 17:32:32
  * @LastEditors: Sclea
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/android/src/main/java/com/lajiaoyang/ali_auth/AliAuthPlugin.java
@@ -425,7 +425,6 @@ public class AliAuthPlugin implements FlutterPlugin, MethodCallHandler, Activity
                 jsonObject.put("msg", "唤起授权页成功！");
                 jsonObject.put("code", "0");
                 return;
-                break;
             case "600002":
                 jsonObject.put("msg", "唤起授权⻚失败！建议切换到其他登录⽅式");
                 break;
