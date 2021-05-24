@@ -7,8 +7,9 @@
 
 #import "AliAuthCustomUIUtil.h"
 #import "AliAuthPluginUtil.h"
+
 @implementation AliAuthCustomUIUtil
-+ (TXCustomModel *)handle:(NSDictionary *)arguments {
++ (TXCustomModel *)handle:(NSDictionary *)arguments registrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     
     NSDictionary *customUIConfig = arguments[@"UIConfig"];
     
@@ -23,7 +24,7 @@
         NSString *logoImageKey = customUIConfig[@"logoImage"];
         NSArray *privacy = customUIConfig[@"privacy"];
         if (logoImageKey != nil) {
-            model.logoImage = [AliAuthPluginUtil getFlutterAssetImage:logoImageKey];
+            model.logoImage = [UIImage imageNamed:[registrar lookupKeyForAsset:logoImageKey]];
         }
         if (loginBtnColorsStr != nil) {
             NSArray *loginBtnBgImgs = [loginBtnColorsStr componentsSeparatedByString:@","];

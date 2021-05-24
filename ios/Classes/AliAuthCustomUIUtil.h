@@ -7,10 +7,10 @@
 
 #import <Foundation/Foundation.h>
 #import <ATAuthSDK/ATAuthSDK.h>
-
+#import <Flutter/Flutter.h>
 
 @interface AliAuthCustomUIUtil : NSObject
-+ (TXCustomModel *)handle:(NSDictionary *)arguments;
++ (TXCustomModel *)handle:(NSDictionary *)arguments registrar:(NSObject<FlutterPluginRegistrar>*)registrar;
 @end
 
 

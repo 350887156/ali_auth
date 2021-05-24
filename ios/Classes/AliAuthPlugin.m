@@ -7,6 +7,7 @@ static NSTimeInterval const kTimerOut = 3;
 static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.ali_auth.BasicMessageChannel";
 @interface AliAuthPlugin()
 @property (nonatomic, strong) FlutterMethodChannel *channel;
+@property (nonatomic, weak) NSObject<FlutterPluginRegistrar>* registrar;
 @property (nonatomic, assign) BOOL initSDK;
 @end
 @implementation AliAuthPlugin
@@ -14,15 +15,16 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
   FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"com.lajiaoyang.ali_auth"
             binaryMessenger:[registrar messenger]];
-  AliAuthPlugin* instance = [[AliAuthPlugin alloc] initWithChannel:channel];
+  AliAuthPlugin* instance = [[AliAuthPlugin alloc] initWithRegistrar:registrar channel:channel];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
-- (instancetype)initWithChannel:(FlutterMethodChannel *)channel;
+- (instancetype)initWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar channel:(FlutterMethodChannel *)channel;
 {
     
     self = [super init];
     if (self) {
         self.channel = channel;
+        self.registrar = registrar;
     }
     return self;
 }
@@ -39,23 +41,23 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
         self.initSDK = YES;
       NSString *appKey = call.arguments[@"appKey"];
       [[TXCommonHandler sharedInstance] setAuthSDKInfo:appKey complete:^(NSDictionary * _Nonnull resultDic) {
-          __strong typeof(self) strongSelf = weakSelf;
-          [strongSelf _handelMethod:call.method resultDic:resultDic];
+          [weakSelf _handelMethod:call.method resultDic:resultDic];
       }];
   } else if ([@"pre" isEqualToString:call.method]) {
       [[TXCommonHandler sharedInstance] accelerateLoginPageWithTimeout:kTimerOut complete:^(NSDictionary * _Nonnull resultDic) {
-          __strong typeof(self) strongSelf = weakSelf;
-          [strongSelf _handelMethod:call.method resultDic:resultDic];
+          [weakSelf _handelMethod:call.method resultDic:resultDic];
       }];
   } else if ([@"login" isEqualToString:call.method]) {
-      UIViewController *controller = [AliAuthPluginUtil findCurrentViewController];
-      TXCustomModel *model = [AliAuthCustomUIUtil handle:call.arguments];
+      UIViewController *controller = [UIApplication sharedApplication].keyWindow.rootViewController;
+      TXCustomModel *model = [AliAuthCustomUIUtil handle:call.arguments registrar:self.registrar];
       [[TXCommonHandler sharedInstance] getLoginTokenWithTimeout:kTimerOut controller:controller model:model complete:^(NSDictionary * _Nonnull resultDic) {
-          __strong typeof(self) strongSelf = weakSelf;
           NSString *code = resultDic[@"resultCode"];
-          if ([@"600001" isEqualToString:code] || [@"700002" isEqualToString:code]) {
+          if ([@"600001" isEqualToString:code] ||
+              [@"700002" isEqualToString:code] ||
+              [@"700003" isEqualToString:code] ||
+              [@"700004" isEqualToString:code] ) {
           } else {
-              [strongSelf _handelMethod:call.method resultDic:resultDic];
+              [weakSelf _handelMethod:call.method resultDic:resultDic];
               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                   [[TXCommonHandler sharedInstance] cancelLoginVCAnimated:YES complete:nil];
               });
@@ -63,13 +65,11 @@ static NSString * const kAliAuthPluginBasicMessageChannelKey = @"com.lajiaoyang.
       }];
   } else if ([@"checkEnvAvailable" isEqualToString:call.method]) {
       [[TXCommonHandler sharedInstance] checkEnvAvailableWithAuthType:PNSAuthTypeLoginToken complete:^(NSDictionary * _Nullable resultDic) {
-          __strong typeof(self) strongSelf = weakSelf;
-          [strongSelf _handelMethod:call.method resultDic:resultDic];
+          [weakSelf _handelMethod:call.method resultDic:resultDic];
       }];
   } else if ([@"accelerateVerify" isEqualToString:call.method]) {
       [[TXCommonHandler sharedInstance] accelerateVerifyWithTimeout:kTimerOut complete:^(NSDictionary * _Nonnull resultDic) {
-          __strong typeof(self) strongSelf = weakSelf;
-          [strongSelf _handelMethod:call.method resultDic:resultDic];
+          [weakSelf _handelMethod:call.method resultDic:resultDic];
       }];
       
   } else if ([@"cancelLogin" isEqualToString:call.method]){
