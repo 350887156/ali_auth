@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:03
- * @LastEditTime: 2021-05-19 14:42:22
- * @LastEditors: Sclea
+ * @LastEditTime: 2021-06-21 10:11:32
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /example/lib/main.dart
  */
@@ -24,6 +24,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  void initState() {
+    super.initState();
+    AliAuth.init(
+        iOSKey: Config.iOSKey,
+        androidKey: Config.androidKey,
+        callback: (result) {
+          print('flutter打印日志${result.toMap}');
+        });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -32,14 +43,6 @@ class _MyAppState extends State<MyApp> {
         ),
         body: ListView(
           children: [
-            _action('初始化', () async {
-              AliAuth.init(
-                  iOSKey: Config.iOSKey,
-                  androidKey: Config.androidKey,
-                  callback: (result) {
-                    print('flutter打印日志${result.toMap}');
-                  });
-            }),
             _action('取消登录', () async {
               AliAuth.cancelLogin(callback: (result) {
                 print('flutter打印日志${result.toMap}');
@@ -53,6 +56,10 @@ class _MyAppState extends State<MyApp> {
             _action('login', () async {
               final model = AliAuthUIConfig(
                   logoImage: 'assets/taobao.png',
+                  checkBoxImage: [
+                    'assets/check_box.png',
+                    'assets/un_check_box.png'
+                  ],
                   privacy: AliAuthUIConfigPrivacy(
                       title: '协议', url: 'https://www.baidu.com'),
                   loginBtnColors: ['#00A57B', '#878282', '#00A57B']);
