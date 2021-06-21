@@ -19,6 +19,7 @@
     model.alertTitleBarColor = [UIColor whiteColor];
     model.alertTitle = [[NSAttributedString alloc] init];
     model.alertCloseImage = [UIImage imageNamed:@"icon_close_gray"];
+
     if (customUIConfig != nil) {
         NSString *loginBtnColorsStr = customUIConfig[@"loginBtnColors"];
         NSString *logoImageKey = customUIConfig[@"logoImage"];
@@ -42,7 +43,17 @@
     
     model.changeBtnIsHidden = YES;
     model.checkBoxIsChecked = true;
-    
+    NSArray *checkBoxImages = customUIConfig[@"checkBoxImages"];
+    if ([checkBoxImages isKindOfClass:[NSArray class]] && checkBoxImages.count == 2) {
+        NSString *checkImagePath = [registrar lookupKeyForAsset:checkBoxImages[0]];
+        NSString *unCheckImagePath = [registrar lookupKeyForAsset:checkBoxImages[1]];
+        UIImage *checkImage = [UIImage imageNamed:checkImagePath];
+        UIImage *unCheckImage = [UIImage imageNamed:unCheckImagePath];
+        if (checkImage != nil && unCheckImage != nil) {
+            model.checkBoxImages = @[unCheckImage,checkImage];
+        }
+        
+    }
     model.contentViewFrameBlock = ^CGRect(CGSize screenSize, CGSize superViewSize, CGRect frame) {
         frame.size.width = superViewSize.width;
         frame.size.height = 460;

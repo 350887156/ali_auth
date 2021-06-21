@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2021-05-12 17:29:01
- * @LastEditTime: 2021-05-20 09:06:43
- * @LastEditors: Sclea
+ * @LastEditTime: 2021-06-21 10:19:11
+ * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /ali_auth/lib/ali_auth.dart
  */
@@ -134,9 +134,11 @@ class AliAuth {
 
 class AliAuthUIConfig {
   String logoImage;
+  List<String> checkBoxImage;
   List<String> loginBtnColors;
   AliAuthUIConfigPrivacy privacy;
-  AliAuthUIConfig({this.logoImage, this.loginBtnColors, this.privacy});
+  AliAuthUIConfig(
+      {this.logoImage, this.loginBtnColors, this.privacy, this.checkBoxImage});
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};
     map['logoImage'] = logoImage;
@@ -147,6 +149,7 @@ class AliAuthUIConfig {
     if (privacy?.title != null && privacy?.url != null) {
       map['privacy'] = [privacy.title, privacy.url];
     }
+    map['checkBoxImages'] = checkBoxImage;
     return map;
   }
 }
