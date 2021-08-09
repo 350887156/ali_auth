@@ -22,6 +22,7 @@ A new Flutter plugin.
   s.static_framework = false
   # 加载静态资源
   s.resources = ['Assets/*']
+  s.xcconfig = { 'OTHER_LDFLAGS' => '-ObjC' }
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
